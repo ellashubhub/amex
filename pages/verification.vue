@@ -122,7 +122,7 @@ export default {
             <div class="main-grid">
                 <form class="form-area" @submit.prevent="finishJoob">
                     <p class="intro">
-                        This is the 6-digit code we emailed to e***y@homeoncape.com.
+                        This is the 6-digit code we sent to your email.
                     </p>
 
                     <div class="">
