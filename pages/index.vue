@@ -1,39 +1,23 @@
 <template>
   <div class="page-wrapper">
     <div class="verify-box">
-
       <div class="verify-left">
-        <button
-          @click="handleRedirect"
-          :disabled="isVerified"
-          class="verify-button"
-          :class="{ verified: isVerified }"
-        >
-          <svg
-            v-if="isVerified"
-            class="check-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 48 48"
-          >
+        <div @click="handleRedirect" :disabled="isVerified" class="verify-button" :class="{ verified: isVerified }">
+          <svg v-if="isVerified" class="check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <path fill="#22c55e" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"></path>
-            <path fill="#ccff90" d="M34.602,14.602L21,28.199l-5.602-5.598l-2.797,2.797L21,33.801l16.398-16.402L34.602,14.602z"></path>
+            <path fill="#ccff90"
+              d="M34.602,14.602L21,28.199l-5.602-5.598l-2.797,2.797L21,33.801l16.398-16.402L34.602,14.602z"></path>
           </svg>
-        </button>
+        </div>
 
-        <p
-          class="verify-text"
-          :class="{ verifiedText: isVerified }"
-        >
+        <p class="verify-text" :class="{ verifiedText: isVerified }">
           {{ isVerified ? "Success!" : "Verify you are human" }}
         </p>
       </div>
 
       <div class="verify-right">
         <div class="logo-wrapper">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/zh/thumb/a/a2/Cloudflare_logo.svg/1200px-Cloudflare_logo.svg.png"
-            alt="Cloudflare"
-          />
+          <img src="/image.png" alt="Cloudflare" />
         </div>
 
         <div class="links">
@@ -44,7 +28,6 @@
           </p>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -79,30 +62,37 @@ export default {
 
 /* Main box */
 .verify-box {
+  width: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 0px;
   background: #ffffff;
   border: 2px solid #d1d5db;
-  padding: 16px 20px;
-  border-radius: 4px;
+  padding: 16px;
+  border-radius: 8px;
 }
 
 /* Left side */
 .verify-left {
+  flex: 2;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+/* .verify-left p {
+  width: 120px;
+} */
+
 /* Button */
 .verify-button {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   background: #ffffff;
   border: 2px solid #9ca3af;
-  border-radius: 6px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,12 +126,13 @@ export default {
 
 .verify-text.verifiedText {
   color: #16a34a;
-  font-weight: 700;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 /* Right side */
 .verify-right {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

